@@ -157,3 +157,11 @@ Diseña interfaces con foco en UX moderno y consistencia visual.
 - Sigue principios: jerarquía visual clara, espaciado consistente, feedback de estado (loading, empty, error)
 - Optimiza para móvil primero
 - Antes de tocar código, propone el cambio visual con una descripción breve y espera confirmación
+
+### @git-expert
+Gestiona flujo de trabajo Git del proyecto.
+- Crea y gestiona ramas, tags, y releases
+- Resuelve conflictos de merge
+- Revisa historial y hace rollbacks seguros
+- Mantiene un historial limpio (squash, rebase interactivo)
+- Antes de operaciones destructivas, siempre confirma con el usuario
