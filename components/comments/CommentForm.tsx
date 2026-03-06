@@ -2,8 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Send } from 'lucide-react';
 import { addCommentAction } from '@/app/actions/social';
 import { toast } from 'sonner';
 
@@ -20,13 +19,16 @@ export function CommentForm({ itemId, isAuthenticated }: CommentFormProps) {
 
   if (!isAuthenticated) {
     return (
-      <div className="border rounded-lg p-4 text-center bg-muted/50">
+      <div className="rounded-xl border border-dashed border-border bg-muted/30 p-6 text-center">
         <p className="text-sm text-muted-foreground mb-3">
-          Inicia sesión para dejar un comentario
+          Inicia sesión para unirte a la discusión
         </p>
-        <Button size="sm" onClick={() => router.push('/login')}>
+        <button
+          onClick={() => router.push('/login')}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+        >
           Iniciar sesión
-        </Button>
+        </button>
       </div>
     );
   }
@@ -49,27 +51,32 @@ export function CommentForm({ itemId, isAuthenticated }: CommentFormProps) {
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="space-y-3">
+    <form ref={formRef} onSubmit={handleSubmit}>
       <input type="hidden" name="itemId" value={itemId} />
-
-      <div className="space-y-1.5">
-        <Label htmlFor="content">Tu comentario</Label>
+      <div className="relative">
         <textarea
-          id="content"
           name="content"
           rows={3}
           maxLength={2000}
           required
-          placeholder="¿Qué opinas?"
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+          placeholder="Comparte tu opinión..."
+          className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary resize-none transition-all pr-24"
           onChange={(e) => setCharCount(e.target.value.length)}
         />
-        <p className="text-xs text-right text-muted-foreground">{charCount}/2000</p>
+        <div className="absolute bottom-3 right-3 flex items-center gap-2">
+          <span className={`text-xs ${charCount > 1800 ? 'text-destructive' : 'text-muted-foreground'}`}>
+            {charCount}/2000
+          </span>
+          <button
+            type="submit"
+            disabled={isPending}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors disabled:opacity-60"
+          >
+            <Send className="h-3 w-3" />
+            {isPending ? 'Enviando...' : 'Publicar'}
+          </button>
+        </div>
       </div>
-
-      <Button type="submit" size="sm" disabled={isPending}>
-        {isPending ? 'Publicando...' : 'Publicar comentario'}
-      </Button>
     </form>
   );
 }

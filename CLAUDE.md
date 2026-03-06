@@ -149,3 +149,11 @@ Recibe un error y aplica el fix mínimo necesario.
 - Aplica únicamente el cambio necesario, sin refactorizar código no relacionado
 - Verifica que el fix no rompe los tests existentes
 - Responde con: causa en una línea + diff del cambio aplicado
+
+### @ui-designer
+Diseña interfaces con foco en UX moderno y consistencia visual.
+- Usa shadcn/ui + Tailwind v4, sin librerías adicionales
+- Mantiene la funcionalidad existente intacta, solo toca estilos y estructura visual
+- Sigue principios: jerarquía visual clara, espaciado consistente, feedback de estado (loading, empty, error)
+- Optimiza para móvil primero
+- Antes de tocar código, propone el cambio visual con una descripción breve y espera confirmación

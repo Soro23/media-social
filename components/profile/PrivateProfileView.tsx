@@ -1,9 +1,7 @@
 import Link from 'next/link';
-import { CalendarDays, ExternalLink } from 'lucide-react';
+import { CalendarDays, ExternalLink, Lock } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { ProfileEditForm } from '@/components/profile/ProfileEditForm';
 import type { Profile } from '@/types';
 
@@ -22,66 +20,71 @@ export function PrivateProfileView({ profile, favCount, ratingCount }: PrivatePr
 
   return (
     <div className="max-w-xl space-y-6">
-      {/* Vista previa — cómo te ven otros */}
-      <Card>
-        <CardContent className="pt-6 space-y-4">
-          <div className="flex items-start gap-4">
-            <Avatar className="h-20 w-20 flex-shrink-0">
+      {/* Profile preview card */}
+      <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
+        {/* Gradient header strip */}
+        <div className="h-20 bg-gradient-to-br from-primary/30 via-primary/10 to-transparent" />
+
+        <div className="px-6 pb-6">
+          {/* Avatar overlapping the strip */}
+          <div className="-mt-10 mb-4 flex items-end justify-between">
+            <Avatar className="h-20 w-20 ring-4 ring-background shadow-lg">
               <AvatarImage src={profile.avatar_url || undefined} />
-              <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
+              <AvatarFallback className="text-xl font-bold bg-primary/10 text-primary">
+                {initials}
+              </AvatarFallback>
             </Avatar>
-
-            <div className="flex-1 min-w-0 space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xl font-bold leading-tight">
-                  {profile.display_name || profile.username}
-                </span>
-                {profile.display_name && (
-                  <span className="text-sm text-muted-foreground">@{profile.username}</span>
-                )}
-              </div>
-              {!profile.display_name && (
-                <p className="text-sm text-muted-foreground">@{profile.username}</p>
-              )}
-              {profile.bio && (
-                <p className="text-sm text-muted-foreground leading-relaxed">{profile.bio}</p>
-              )}
-
-              <div className="flex flex-wrap items-center gap-3 pt-1">
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <CalendarDays className="h-3.5 w-3.5" />
-                  Miembro desde {joinedDate}
-                </span>
-                {!profile.favorites_public && (
-                  <Badge variant="outline" className="text-xs">Favoritos privados</Badge>
-                )}
-              </div>
-
-              <div className="flex gap-4 pt-1">
-                <div className="text-center">
-                  <p className="text-base font-semibold leading-none">{favCount}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Favoritos</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-base font-semibold leading-none">{ratingCount}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Ratings</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t pt-3">
-            <Button variant="ghost" size="sm" asChild className="text-muted-foreground -ml-2">
-              <Link href={`/perfil/${profile.username}`}>
+            <Button variant="outline" size="sm" asChild className="mb-1 text-xs">
+              <Link href={`/perfil/${profile.username}`} className="flex items-center gap-1.5">
                 <ExternalLink className="h-3.5 w-3.5" />
                 Ver perfil público
               </Link>
             </Button>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Formularios de edición */}
+          {/* Name & username */}
+          <div className="space-y-0.5 mb-3">
+            <h2 className="text-xl font-bold leading-tight">
+              {profile.display_name || profile.username}
+            </h2>
+            <p className="text-sm text-muted-foreground">@{profile.username}</p>
+          </div>
+
+          {/* Bio */}
+          {profile.bio && (
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4">{profile.bio}</p>
+          )}
+
+          {/* Stats */}
+          <div className="flex items-center gap-5 mb-4">
+            <div>
+              <span className="text-lg font-bold">{favCount}</span>
+              <span className="text-xs text-muted-foreground ml-1.5">Favoritos</span>
+            </div>
+            <div className="h-4 w-px bg-border" />
+            <div>
+              <span className="text-lg font-bold">{ratingCount}</span>
+              <span className="text-xs text-muted-foreground ml-1.5">Ratings</span>
+            </div>
+          </div>
+
+          {/* Meta info */}
+          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <CalendarDays className="h-3.5 w-3.5" />
+              Miembro desde {joinedDate}
+            </span>
+            {!profile.favorites_public && (
+              <span className="flex items-center gap-1">
+                <Lock className="h-3.5 w-3.5" />
+                Favoritos privados
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Edit form */}
       <ProfileEditForm profile={profile} />
     </div>
   );

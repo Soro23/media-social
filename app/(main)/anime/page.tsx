@@ -51,23 +51,18 @@ export default async function AnimePage({ searchParams }: AnimePageProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold mb-1">Anime</h1>
-        <p className="text-muted-foreground">
-          {searchResult.total.toLocaleString('es')} títulos disponibles
+      <div className="flex items-end justify-between gap-4">
+        <h1 className="text-4xl font-extrabold tracking-tight">Anime</h1>
+        <p className="text-sm text-muted-foreground pb-1">
+          {searchResult.total.toLocaleString('es')} títulos
         </p>
       </div>
 
       <SearchBar />
 
-      <div>
-        <h2 className="text-sm font-medium mb-3 text-muted-foreground uppercase tracking-wide">
-          Géneros
-        </h2>
-        <Suspense>
-          <GenreFilter genres={genres} selectedId={genreId} />
-        </Suspense>
-      </div>
+      <Suspense>
+        <GenreFilter genres={genres} selectedId={genreId} />
+      </Suspense>
 
       <Suspense fallback={<ItemGridSkeleton />}>
         <ItemGrid items={itemsWithStats} />

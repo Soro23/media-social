@@ -1,8 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Star } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import type { Category, Item } from '@/types';
 
 const CATEGORY_PATHS: Record<Category, string> = {
@@ -21,6 +19,15 @@ const CATEGORY_LABELS: Record<Category, string> = {
   serie: 'Serie',
 };
 
+// Subtle color per category for the badge
+const CATEGORY_COLORS: Record<Category, string> = {
+  anime:    'bg-violet-500/90 text-white',
+  manga:    'bg-orange-700/90 text-white',
+  libro:    'bg-amber-500/90 text-white',
+  pelicula: 'bg-rose-500/90 text-white',
+  serie:    'bg-emerald-500/90 text-white',
+};
+
 interface ItemCardProps {
   item: Item;
   showCategory?: boolean;
@@ -31,56 +38,66 @@ export function ItemCard({ item, showCategory = false, priority = false }: ItemC
   const path = `${CATEGORY_PATHS[item.category]}/${item.external_id}`;
 
   return (
-    <Link href={path} className="group">
-      <Card className="overflow-hidden h-full transition-shadow hover:shadow-lg py-0">
-        <div className="relative aspect-[2/3] w-full bg-muted overflow-hidden">
+    <Link href={path} className="group block">
+      <div className="relative overflow-hidden rounded-xl bg-muted shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:shadow-primary/10">
+        {/* Poster */}
+        <div className="relative aspect-[2/3] w-full overflow-hidden">
           {item.cover_url ? (
             <Image
               src={item.cover_url}
               alt={item.title}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              className="object-cover transition-transform group-hover:scale-105"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
               priority={priority}
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
+            <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground text-xs">
               Sin imagen
             </div>
           )}
 
-          {/* Badge de categoría */}
+          {/* Gradient overlay at bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+          {/* Category badge */}
           {showCategory && (
             <div className="absolute top-2 left-2">
-              <Badge variant="secondary" className="text-xs">
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm ${CATEGORY_COLORS[item.category]}`}>
                 {CATEGORY_LABELS[item.category]}
-              </Badge>
+              </span>
             </div>
           )}
 
-          {/* Rating overlay */}
+          {/* Rating badge */}
           {item.rating_count > 0 && (
-            <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+            <div className="absolute bottom-2 right-2 flex items-center gap-0.5 bg-black/75 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
               <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-              <span>{item.avg_rating}</span>
+              <span className="font-semibold">{item.avg_rating}</span>
             </div>
           )}
         </div>
 
-        <CardContent className="p-3">
-          <h3 className="font-medium text-sm line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+        {/* Info */}
+        <div className="p-2.5">
+          <h3 className="font-semibold text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors duration-150">
             {item.title}
           </h3>
-          {item.year && (
-            <p className="text-xs text-muted-foreground mt-1">{item.year}</p>
-          )}
-          {item.genres.length > 0 && (
-            <p className="text-xs text-muted-foreground mt-1 truncate">
-              {item.genres.slice(0, 2).join(' · ')}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+          <div className="flex items-center gap-1.5 mt-1">
+            {item.year && (
+              <span className="text-[11px] text-muted-foreground">{item.year}</span>
+            )}
+            {item.year && item.genres.length > 0 && (
+              <span className="text-[11px] text-muted-foreground">·</span>
+            )}
+            {item.genres.length > 0 && (
+              <span className="text-[11px] text-muted-foreground truncate">
+                {item.genres[0]}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
     </Link>
   );
 }

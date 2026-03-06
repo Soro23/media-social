@@ -22,14 +22,14 @@ interface CommentListProps {
 export function CommentList({ comments, currentUserId }: CommentListProps) {
   if (comments.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground py-4 text-center">
-        Sé el primero en comentar
+      <p className="text-sm text-muted-foreground py-6 text-center">
+        Todavia no hay comentarios. Se el primero.
       </p>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="divide-y divide-border/60">
       {comments.map((comment) => (
         <CommentItem
           key={comment.id}
@@ -77,38 +77,37 @@ function CommentItem({
   });
 
   return (
-    <div className="flex gap-3">
-      <Avatar className="h-8 w-8 flex-shrink-0">
+    <div className="flex gap-3 py-4 group/comment">
+      <Avatar className="h-8 w-8 flex-shrink-0 mt-0.5">
         <AvatarImage src={comment.avatar_url || undefined} />
-        <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+        <AvatarFallback className="text-xs bg-primary/10 text-primary font-semibold">
+          {initials}
+        </AvatarFallback>
       </Avatar>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-medium text-sm">@{username}</span>
+          <span className="text-sm font-semibold">@{username}</span>
           <span className="text-xs text-muted-foreground">{timeAgo}</span>
         </div>
-        <p className="text-sm mt-1 break-words whitespace-pre-wrap">{comment.content}</p>
+        <p className="text-sm mt-1.5 text-foreground/90 leading-relaxed break-words whitespace-pre-wrap">
+          {comment.content}
+        </p>
       </div>
 
-      <div className="flex items-start gap-1 flex-shrink-0">
+      <div className="flex items-start gap-0.5 opacity-0 group-hover/comment:opacity-100 transition-opacity flex-shrink-0">
         {isOwner ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-muted-foreground hover:text-destructive"
+          <button
             onClick={handleDelete}
             disabled={isPending}
+            className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+            title="Eliminar"
           >
             <Trash2 className="h-3.5 w-3.5" />
-          </Button>
+          </button>
         ) : (
           isAuthenticated && (
-            <ReportDialog
-              commentId={comment.id}
-              open={reportOpen}
-              onOpenChange={setReportOpen}
-            />
+            <ReportDialog commentId={comment.id} open={reportOpen} onOpenChange={setReportOpen} />
           )
         )}
       </div>
@@ -146,9 +145,12 @@ function ReportDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-orange-500">
+        <button
+          className="p-1.5 rounded-md text-muted-foreground hover:text-orange-500 hover:bg-orange-500/10 transition-all"
+          title="Reportar"
+        >
           <Flag className="h-3.5 w-3.5" />
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

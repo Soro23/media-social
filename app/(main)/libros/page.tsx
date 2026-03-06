@@ -49,19 +49,16 @@ export default async function LibrosPage({ searchParams }: LibrosPageProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold mb-1">Libros</h1>
-        <p className="text-muted-foreground">Busca entre millones de libros</p>
+      <div className="flex items-end justify-between gap-4">
+        <h1 className="text-4xl font-extrabold tracking-tight">Libros</h1>
+        <p className="text-sm text-muted-foreground pb-1">Millones de títulos</p>
       </div>
 
       <SearchBar />
 
-      <div>
-        <h2 className="text-sm font-medium mb-3 text-muted-foreground uppercase tracking-wide">Géneros</h2>
-        <Suspense>
-          <GenreFilter genres={genres} selectedId={genreId} />
-        </Suspense>
-      </div>
+      <Suspense>
+        <GenreFilter genres={genres} selectedId={genreId} />
+      </Suspense>
 
       <Suspense fallback={<ItemGridSkeleton />}>
         <ItemGrid items={itemsWithStats} />

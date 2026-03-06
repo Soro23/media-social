@@ -32,13 +32,19 @@ export default async function MainLayout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar profile={profile} />
       <main className="flex-1 container mx-auto px-4 py-8">
         {children}
       </main>
-      <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-        <p>© {new Date().getFullYear()} MediaSocial · Datos de Jikan, TMDB y Open Library</p>
+      <footer className="border-t border-border/50 py-8 mt-12">
+        <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1.5 font-medium">
+            <span className="text-primary">Media</span>
+            <span>Social</span>
+          </div>
+          <p>© {new Date().getFullYear()} · Datos de Jikan, TMDB y Open Library</p>
+        </div>
       </footer>
     </div>
   );

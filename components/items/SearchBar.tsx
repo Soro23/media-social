@@ -3,8 +3,6 @@
 import { useState, useCallback } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Search, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 
 export function SearchBar() {
   const router = useRouter();
@@ -37,28 +35,31 @@ export function SearchBar() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="relative flex gap-2">
-      <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
+    <form onSubmit={handleSubmit} className="relative">
+      <div className="relative flex items-center">
+        <Search className="absolute left-4 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <input
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="Buscar..."
-          className="pl-9 pr-9"
+          placeholder="Buscar por título..."
+          className="w-full h-11 pl-11 pr-24 rounded-full border border-input bg-background text-sm shadow-sm transition-all placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
         />
         {value && (
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-20 text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
         )}
+        <button
+          type="submit"
+          className="absolute right-1.5 h-8 px-4 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+        >
+          Buscar
+        </button>
       </div>
-      <Button type="submit" size="sm">
-        Buscar
-      </Button>
     </form>
   );
 }
