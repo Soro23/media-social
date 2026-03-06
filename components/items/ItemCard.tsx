@@ -24,9 +24,10 @@ const CATEGORY_LABELS: Record<Category, string> = {
 interface ItemCardProps {
   item: Item;
   showCategory?: boolean;
+  priority?: boolean;
 }
 
-export function ItemCard({ item, showCategory = false }: ItemCardProps) {
+export function ItemCard({ item, showCategory = false, priority = false }: ItemCardProps) {
   const path = `${CATEGORY_PATHS[item.category]}/${item.external_id}`;
 
   return (
@@ -40,6 +41,7 @@ export function ItemCard({ item, showCategory = false }: ItemCardProps) {
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
               className="object-cover transition-transform group-hover:scale-105"
+              priority={priority}
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">

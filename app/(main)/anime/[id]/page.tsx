@@ -36,19 +36,18 @@ export default async function AnimeDetailPage({ params }: AnimeDetailPageProps) 
     userId = (await account.get()).$id;
   } catch { /* no autenticado */ }
 
-  const { databases } = createAdminClient();
   const [favoriteResult, ratingResult, commentsResult] = await Promise.all([
     userId
-      ? databases.listDocuments(DATABASE_ID, COLLECTIONS.FAVORITES, [
+      ? createAdminClient().databases.listDocuments(DATABASE_ID, COLLECTIONS.FAVORITES, [
           Query.equal('user_id', userId), Query.equal('item_id', item.id), Query.limit(1),
         ])
       : Promise.resolve(null),
     userId
-      ? databases.listDocuments(DATABASE_ID, COLLECTIONS.RATINGS, [
+      ? createAdminClient().databases.listDocuments(DATABASE_ID, COLLECTIONS.RATINGS, [
           Query.equal('user_id', userId), Query.equal('item_id', item.id), Query.limit(1),
         ])
       : Promise.resolve(null),
-    databases.listDocuments(DATABASE_ID, COLLECTIONS.COMMENTS, [
+    createAdminClient().databases.listDocuments(DATABASE_ID, COLLECTIONS.COMMENTS, [
       Query.equal('item_id', item.id), Query.orderDesc('$createdAt'), Query.limit(50),
     ]),
   ]);

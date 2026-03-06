@@ -27,7 +27,7 @@ export default async function SeriesPage({ searchParams }: SeriesPageProps) {
     searchSeries({ query, genreId, page }),
   ]);
 
-  await cacheItems(searchResult.items);
+  cacheItems(searchResult.items).catch(console.error);
 
   const cachedMap = await getCachedItemsByExternalIds(
     'serie',

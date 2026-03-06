@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Trash2, Flag } from 'lucide-react';
@@ -50,6 +51,7 @@ function CommentItem({
   isOwner: boolean;
   isAuthenticated: boolean;
 }) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [reportOpen, setReportOpen] = useState(false);
 
@@ -57,8 +59,12 @@ function CommentItem({
     if (!confirm('¿Eliminar este comentario?')) return;
     startTransition(async () => {
       const result = await deleteCommentAction(comment.id);
-      if (!result.success) toast.error(result.error);
-      else toast.success('Comentario eliminado');
+      if (!result.success) {
+        toast.error(result.error);
+      } else {
+        toast.success('Comentario eliminado');
+        router.refresh();
+      }
     });
   }
 

@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,10 +12,8 @@ import { registerAction } from '@/app/actions/auth';
 import { GoogleButton } from './GoogleButton';
 
 export function RegisterForm() {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,29 +23,12 @@ export function RegisterForm() {
     startTransition(async () => {
       const result = await registerAction(formData);
       if (result.success) {
-        setSuccess(true);
-        toast.success('¡Cuenta creada! Revisa tu email para verificarla.');
+        toast.success('¡Bienvenido a MediaSocial!');
+        window.location.href = '/';
       } else {
         setError(result.error);
       }
     });
-  }
-
-  if (success) {
-    return (
-      <Card>
-        <CardContent className="pt-6 text-center space-y-4">
-          <div className="text-4xl">📧</div>
-          <h2 className="text-xl font-semibold">Verifica tu email</h2>
-          <p className="text-muted-foreground">
-            Te hemos enviado un email de verificación. Haz clic en el enlace para activar tu cuenta.
-          </p>
-          <Button variant="outline" asChild>
-            <Link href="/login">Volver al inicio de sesión</Link>
-          </Button>
-        </CardContent>
-      </Card>
-    );
   }
 
   return (

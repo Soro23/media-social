@@ -8,7 +8,16 @@ interface ItemGridProps {
 }
 
 export function ItemGrid({ items, showCategory = false }: ItemGridProps) {
-  if (items.length === 0) {
+  // Deduplicar por si la API externa devuelve entradas repetidas
+  const seen = new Set<string>();
+  const uniqueItems = items.filter((item) => {
+    const key = `${item.category}-${item.external_id}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  if (uniqueItems.length === 0) {
     return (
       <div className="text-center py-16 text-muted-foreground">
         <p className="text-lg">No se encontraron resultados</p>
@@ -19,8 +28,13 @@ export function ItemGrid({ items, showCategory = false }: ItemGridProps) {
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-      {items.map((item) => (
-        <ItemCard key={`${item.category}-${item.external_id}`} item={item} showCategory={showCategory} />
+      {uniqueItems.map((item, i) => (
+        <ItemCard
+          key={`${item.category}-${item.external_id}`}
+          item={item}
+          showCategory={showCategory}
+          priority={i < 6}
+        />
       ))}
     </div>
   );

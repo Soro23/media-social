@@ -1,6 +1,6 @@
 // Wrapper para TMDB API (The Movie Database)
 // Docs: https://developer.themoviedb.org/docs
-// Requiere API key en TMDB_API_KEY
+// Requiere API key v3 en TMDB_API_KEY
 
 import type { ExternalItem, Genre, SearchResult } from '@/types';
 
@@ -8,11 +8,15 @@ const BASE_URL = 'https://api.themoviedb.org/3';
 const IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
 const REVALIDATE = 3600; // 1 hora
 
-function getHeaders() {
-  return {
-    Authorization: `Bearer ${process.env.TMDB_API_KEY}`,
-    accept: 'application/json',
-  };
+/** Construye URL con api_key y language ya incluidos */
+function tmdbUrl(path: string, params: Record<string, string> = {}): string {
+  const url = new URL(`${BASE_URL}${path}`);
+  url.searchParams.set('api_key', process.env.TMDB_API_KEY ?? '');
+  url.searchParams.set('language', 'es-ES');
+  for (const [k, v] of Object.entries(params)) {
+    url.searchParams.set(k, v);
+  }
+  return url.toString();
 }
 
 // ----- Helpers -----
@@ -70,8 +74,7 @@ function normalizeSerie(data: Record<string, unknown>, genreMap: Map<number, str
 // ----- Géneros -----
 
 async function fetchMovieGenreMap(): Promise<Map<number, string>> {
-  const res = await fetch(`${BASE_URL}/genre/movie/list?language=es-ES`, {
-    headers: getHeaders(),
+  const res = await fetch(tmdbUrl('/genre/movie/list'), {
     next: { revalidate: 86400 },
   });
   if (!res.ok) return new Map();
@@ -80,8 +83,7 @@ async function fetchMovieGenreMap(): Promise<Map<number, string>> {
 }
 
 async function fetchTVGenreMap(): Promise<Map<number, string>> {
-  const res = await fetch(`${BASE_URL}/genre/tv/list?language=es-ES`, {
-    headers: getHeaders(),
+  const res = await fetch(tmdbUrl('/genre/tv/list'), {
     next: { revalidate: 86400 },
   });
   if (!res.ok) return new Map();
@@ -90,8 +92,7 @@ async function fetchTVGenreMap(): Promise<Map<number, string>> {
 }
 
 export async function getMovieGenres(): Promise<Genre[]> {
-  const res = await fetch(`${BASE_URL}/genre/movie/list?language=es-ES`, {
-    headers: getHeaders(),
+  const res = await fetch(tmdbUrl('/genre/movie/list'), {
     next: { revalidate: 86400 },
   });
   if (!res.ok) return [];
@@ -100,8 +101,7 @@ export async function getMovieGenres(): Promise<Genre[]> {
 }
 
 export async function getTVGenres(): Promise<Genre[]> {
-  const res = await fetch(`${BASE_URL}/genre/tv/list?language=es-ES`, {
-    headers: getHeaders(),
+  const res = await fetch(tmdbUrl('/genre/tv/list'), {
     next: { revalidate: 86400 },
   });
   if (!res.ok) return [];
@@ -117,20 +117,17 @@ export async function searchMovies(params: {
   page?: number;
 }): Promise<SearchResult> {
   const genreMap = await fetchMovieGenreMap();
-  let url: string;
+  const page = String(params.page || 1);
 
-  if (params.query) {
-    url = `${BASE_URL}/search/movie?language=es-ES&query=${encodeURIComponent(params.query)}&page=${params.page || 1}`;
-  } else {
-    url = `${BASE_URL}/discover/movie?language=es-ES&sort_by=popularity.desc&page=${params.page || 1}`;
-    if (params.genreId) url += `&with_genres=${params.genreId}`;
-  }
+  const url = params.query
+    ? tmdbUrl('/search/movie', { query: params.query, page })
+    : tmdbUrl('/discover/movie', {
+        sort_by: 'popularity.desc',
+        page,
+        ...(params.genreId ? { with_genres: params.genreId } : {}),
+      });
 
-  const res = await fetch(url, {
-    headers: getHeaders(),
-    next: { revalidate: REVALIDATE },
-  });
-
+  const res = await fetch(url, { next: { revalidate: REVALIDATE } });
   if (!res.ok) throw new Error(`TMDB API error: ${res.status}`);
 
   const json = (await res.json()) as {
@@ -149,14 +146,11 @@ export async function searchMovies(params: {
 }
 
 export async function getMovieById(id: string): Promise<ExternalItem | null> {
-  const res = await fetch(`${BASE_URL}/movie/${id}?language=es-ES`, {
-    headers: getHeaders(),
+  const res = await fetch(tmdbUrl(`/movie/${id}`), {
     next: { revalidate: REVALIDATE },
   });
-
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`TMDB API error: ${res.status}`);
-
   const json = (await res.json()) as Record<string, unknown>;
   return normalizeMovie(json, new Map());
 }
@@ -169,20 +163,17 @@ export async function searchSeries(params: {
   page?: number;
 }): Promise<SearchResult> {
   const genreMap = await fetchTVGenreMap();
-  let url: string;
+  const page = String(params.page || 1);
 
-  if (params.query) {
-    url = `${BASE_URL}/search/tv?language=es-ES&query=${encodeURIComponent(params.query)}&page=${params.page || 1}`;
-  } else {
-    url = `${BASE_URL}/discover/tv?language=es-ES&sort_by=popularity.desc&page=${params.page || 1}`;
-    if (params.genreId) url += `&with_genres=${params.genreId}`;
-  }
+  const url = params.query
+    ? tmdbUrl('/search/tv', { query: params.query, page })
+    : tmdbUrl('/discover/tv', {
+        sort_by: 'popularity.desc',
+        page,
+        ...(params.genreId ? { with_genres: params.genreId } : {}),
+      });
 
-  const res = await fetch(url, {
-    headers: getHeaders(),
-    next: { revalidate: REVALIDATE },
-  });
-
+  const res = await fetch(url, { next: { revalidate: REVALIDATE } });
   if (!res.ok) throw new Error(`TMDB API error: ${res.status}`);
 
   const json = (await res.json()) as {
@@ -201,14 +192,11 @@ export async function searchSeries(params: {
 }
 
 export async function getSerieById(id: string): Promise<ExternalItem | null> {
-  const res = await fetch(`${BASE_URL}/tv/${id}?language=es-ES`, {
-    headers: getHeaders(),
+  const res = await fetch(tmdbUrl(`/tv/${id}`), {
     next: { revalidate: REVALIDATE },
   });
-
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`TMDB API error: ${res.status}`);
-
   const json = (await res.json()) as Record<string, unknown>;
   return normalizeSerie(json, new Map());
 }

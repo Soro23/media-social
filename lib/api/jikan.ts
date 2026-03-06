@@ -93,7 +93,10 @@ export async function getAnimeGenres(): Promise<Genre[]> {
   if (!res.ok) return [];
 
   const json = (await res.json()) as { data: Array<{ mal_id: number; name: string }> };
-  return json.data.map((g) => ({ id: g.mal_id, name: g.name }));
+  const seen = new Set<number>();
+  return json.data
+    .filter((g) => { if (seen.has(g.mal_id)) return false; seen.add(g.mal_id); return true; })
+    .map((g) => ({ id: g.mal_id, name: g.name }));
 }
 
 // ----- Manga -----
@@ -150,5 +153,8 @@ export async function getMangaGenres(): Promise<Genre[]> {
   if (!res.ok) return [];
 
   const json = (await res.json()) as { data: Array<{ mal_id: number; name: string }> };
-  return json.data.map((g) => ({ id: g.mal_id, name: g.name }));
+  const seen = new Set<number>();
+  return json.data
+    .filter((g) => { if (seen.has(g.mal_id)) return false; seen.add(g.mal_id); return true; })
+    .map((g) => ({ id: g.mal_id, name: g.name }));
 }

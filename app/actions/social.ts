@@ -1,5 +1,7 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
+
 import { z } from 'zod';
 import { ID, Query, AppwriteException } from 'node-appwrite';
 import { createSessionClient, createAdminClient } from '@/lib/appwrite/server';
@@ -176,6 +178,7 @@ export async function deleteCommentAction(commentId: string): Promise<ActionResu
     });
   } catch { /* item puede no existir */ }
 
+  revalidatePath('/', 'layout');
   return { success: true, data: undefined };
 }
 

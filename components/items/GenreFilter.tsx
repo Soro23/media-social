@@ -23,7 +23,7 @@ export function GenreFilter({ genres, selectedId }: GenreFilterProps) {
     } else {
       params.set('genero', stringId);
     }
-    params.delete('pagina'); // Reiniciar paginación al cambiar género
+    params.delete('pagina');
 
     router.push(`${pathname}?${params.toString()}`);
   }
@@ -35,6 +35,15 @@ export function GenreFilter({ genres, selectedId }: GenreFilterProps) {
     router.push(`${pathname}?${params.toString()}`);
   }
 
+  // Deduplicar por si la API devuelve géneros repetidos
+  const seen = new Set<string>();
+  const uniqueGenres = genres.filter((g) => {
+    const key = String(g.id);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
   return (
     <div className="flex flex-wrap gap-2">
       <Badge
@@ -44,7 +53,7 @@ export function GenreFilter({ genres, selectedId }: GenreFilterProps) {
       >
         Todos
       </Badge>
-      {genres.map((genre) => (
+      {uniqueGenres.map((genre) => (
         <Badge
           key={genre.id}
           variant={selectedId === String(genre.id) ? 'default' : 'outline'}

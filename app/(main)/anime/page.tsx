@@ -28,7 +28,8 @@ export default async function AnimePage({ searchParams }: AnimePageProps) {
     searchAnime({ query, genre: genreId, page }),
   ]);
 
-  await cacheItems(searchResult.items);
+  // Escribir caché en background — no bloquea el render
+  cacheItems(searchResult.items).catch(console.error);
 
   const cachedMap = await getCachedItemsByExternalIds(
     'anime',

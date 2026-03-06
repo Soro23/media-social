@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { updateProfileAction, changeUsernameAction } from '@/app/actions/profile';
 import type { Profile } from '@/types';
 
@@ -19,6 +19,8 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isUsernamePending, startUsernameTrans] = useTransition();
+  const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || '');
+  const initials = (profile.display_name || profile.username).slice(0, 2).toUpperCase();
 
   function handleProfileSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -61,6 +63,26 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleProfileSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Foto de perfil</Label>
+              <div className="flex items-center gap-3">
+                <Avatar className="h-16 w-16 flex-shrink-0">
+                  <AvatarImage src={avatarUrl || undefined} />
+                  <AvatarFallback className="text-lg">{initials}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 space-y-1">
+                  <Input
+                    name="avatar_url"
+                    type="url"
+                    placeholder="https://ejemplo.com/foto.jpg"
+                    value={avatarUrl}
+                    onChange={(e) => setAvatarUrl(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">URL de imagen externa (HTTPS)</p>
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="display_name">Nombre para mostrar</Label>
               <Input

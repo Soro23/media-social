@@ -27,7 +27,7 @@ export default async function MangaPage({ searchParams }: MangaPageProps) {
     searchManga({ query, genre: genreId, page }),
   ]);
 
-  await cacheItems(searchResult.items);
+  cacheItems(searchResult.items).catch(console.error);
 
   const cachedMap = await getCachedItemsByExternalIds(
     'manga',

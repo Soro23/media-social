@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { account, databases } = createAdminClient();
+    const { account, databases, users } = createAdminClient();
     const session = await account.createSession(userId, secret);
 
     // Crear perfil si es el primer login con Google
@@ -38,12 +38,13 @@ export async function GET(request: NextRequest) {
         attempts++;
       }
 
-      const user = await account.get();
+      // Usar users (admin) en lugar de account.get() para evitar error de scope
+      const user = await users.get(userId);
       await databases.createDocument(DATABASE_ID, COLLECTIONS.PROFILES, userId, {
         username,
         display_name: user.name || null,
         bio: null,
-        avatar_url: (user.prefs?.avatar as string) || null,
+        avatar_url: null,
         favorites_public: true,
         username_locked: false,
       });

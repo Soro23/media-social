@@ -27,7 +27,7 @@ export default async function PeliculasPage({ searchParams }: PeliculasPageProps
     searchMovies({ query, genreId, page }),
   ]);
 
-  await cacheItems(searchResult.items);
+  cacheItems(searchResult.items).catch(console.error);
 
   const cachedMap = await getCachedItemsByExternalIds(
     'pelicula',

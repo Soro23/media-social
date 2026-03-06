@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,6 @@ import { loginAction } from '@/app/actions/auth';
 import { GoogleButton } from './GoogleButton';
 
 export function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect') || '/';
   const [isPending, startTransition] = useTransition();
@@ -28,8 +27,7 @@ export function LoginForm() {
       const result = await loginAction(formData);
       if (result.success) {
         toast.success('¡Bienvenido!');
-        router.push(redirectTo);
-        router.refresh();
+        window.location.href = redirectTo || "/";
       } else {
         setError(result.error);
       }

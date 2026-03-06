@@ -1,5 +1,5 @@
 import { Navbar } from '@/components/layout/Navbar';
-import { createSessionClient } from '@/lib/appwrite/server';
+import { createSessionClient, createAdminClient } from '@/lib/appwrite/server';
 import { DATABASE_ID, COLLECTIONS } from '@/lib/appwrite/config';
 import type { Profile } from '@/types';
 
@@ -11,9 +11,10 @@ export default async function MainLayout({
   let profile: Profile | null = null;
 
   try {
-    const { account, databases } = await createSessionClient();
+    const { account } = await createSessionClient();
     const user = await account.get();
 
+    const { databases } = createAdminClient();
     const doc = await databases.getDocument(DATABASE_ID, COLLECTIONS.PROFILES, user.$id);
     profile = {
       id: doc.$id,

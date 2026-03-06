@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
+import { Query } from 'node-appwrite';
 import { createSessionClient, createAdminClient } from '@/lib/appwrite/server';
 import { DATABASE_ID, COLLECTIONS } from '@/lib/appwrite/config';
-import { ProfileEditForm } from '@/components/profile/ProfileEditForm';
+import { PrivateProfileView } from '@/components/profile/PrivateProfileView';
 import type { Profile } from '@/types';
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default async function EditProfilePage() {
   if (!userId) redirect('/login?redirect=/perfil/editar');
 
   const { databases } = createAdminClient();
+
   let profile: Profile | null = null;
   try {
     const doc = await databases.getDocument(DATABASE_ID, COLLECTIONS.PROFILES, userId);
@@ -39,10 +41,25 @@ export default async function EditProfilePage() {
     redirect('/login');
   }
 
+  const [favsResult, ratingsResult] = await Promise.all([
+    databases.listDocuments(DATABASE_ID, COLLECTIONS.FAVORITES, [
+      Query.equal('user_id', userId),
+      Query.limit(1),
+    ]),
+    databases.listDocuments(DATABASE_ID, COLLECTIONS.RATINGS, [
+      Query.equal('user_id', userId),
+      Query.limit(1),
+    ]),
+  ]);
+
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Editar perfil</h1>
-      <ProfileEditForm profile={profile!} />
+      <h1 className="text-3xl font-bold">Mi perfil</h1>
+      <PrivateProfileView
+        profile={profile!}
+        favCount={favsResult.total}
+        ratingCount={ratingsResult.total}
+      />
     </div>
   );
 }
