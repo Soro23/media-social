@@ -6,11 +6,15 @@ import { FavoriteButton } from '@/components/favorites/FavoriteButton';
 import { RatingWidget } from '@/components/items/RatingWidget';
 import { CommentList } from '@/components/comments/CommentList';
 import { CommentForm } from '@/components/comments/CommentForm';
+import { BackButton } from '@/components/items/BackButton';
+import { ItemExtraInfo } from '@/components/items/ItemExtraInfo';
+import { ItemRecommendations } from '@/components/items/ItemRecommendations';
 import type { Item, CommentWithProfile } from '@/types';
 
 interface ItemDetailLayoutProps {
   item: Item;
   categoryLabel: string;
+  categoryHref: string;
   comments: CommentWithProfile[];
   isFavorite: boolean;
   userScore: number | null;
@@ -20,6 +24,7 @@ interface ItemDetailLayoutProps {
 export function ItemDetailLayout({
   item,
   categoryLabel,
+  categoryHref,
   comments,
   isFavorite,
   userScore,
@@ -27,6 +32,11 @@ export function ItemDetailLayout({
 }: ItemDetailLayoutProps) {
   return (
     <div className="max-w-5xl mx-auto">
+      {/* Back button */}
+      <div className="py-3">
+        <BackButton fallbackHref={categoryHref} label={categoryLabel} />
+      </div>
+
       {/* Hero banner */}
       <div className="relative -mx-4 h-64 sm:h-80 overflow-hidden">
         {item.cover_url ? (
@@ -157,6 +167,12 @@ export function ItemDetailLayout({
           </p>
         </div>
       )}
+
+      {/* Extra info: status, creators, streaming, related */}
+      <ItemExtraInfo item={item} />
+
+      {/* Recommendations / Similar */}
+      <ItemRecommendations item={item} />
 
       {/* Comments section */}
       <div className="mt-10 space-y-4">

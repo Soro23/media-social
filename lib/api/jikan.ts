@@ -3,6 +3,7 @@
 // Sin API key requerida | Rate limit: 3 req/s, 60 req/min
 
 import type { ExternalItem, Genre, SearchResult } from '@/types';
+import { fetchAniListByMalId } from './anilist';
 
 const BASE_URL = 'https://api.jikan.moe/v4';
 
@@ -70,19 +71,32 @@ export async function searchAnime(params: {
     total: json.pagination.items.total,
     page: params.page || 1,
     has_next_page: json.pagination.has_next_page,
+    total_pages: json.pagination.last_visible_page,
   };
 }
 
 export async function getAnimeById(id: string): Promise<ExternalItem | null> {
-  const res = await fetch(`${BASE_URL}/anime/${id}`, {
-    next: { revalidate: REVALIDATE },
-  });
+  const [mainRes, recJson] = await Promise.all([
+    fetch(`${BASE_URL}/anime/${id}`, { next: { revalidate: REVALIDATE } }),
+    fetch(`${BASE_URL}/anime/${id}/recommendations`, { next: { revalidate: REVALIDATE } })
+      .then((r) => (r.ok ? (r.json() as Promise<{ data?: unknown[] }>) : null))
+      .catch(() => null),
+  ]);
 
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`Jikan API error: ${res.status}`);
+  if (mainRes.status === 404) return null;
+  if (!mainRes.ok) throw new Error(`Jikan API error: ${mainRes.status}`);
 
-  const json = (await res.json()) as { data: Record<string, unknown> };
-  return normalizeAnime(json.data);
+  const json = (await mainRes.json()) as { data: Record<string, unknown> };
+  const _recommendations = (recJson?.data ?? []).slice(0, 12);
+
+  const item = normalizeAnime({ ...json.data, _recommendations });
+
+  if (!item.description) {
+    const anilist = await fetchAniListByMalId(Number(id), 'ANIME');
+    if (anilist?.description) return { ...item, description: anilist.description };
+  }
+
+  return item;
 }
 
 export async function getAnimeGenres(): Promise<Genre[]> {
@@ -122,7 +136,7 @@ export async function searchManga(params: {
 
   const json = (await res.json()) as {
     data: Record<string, unknown>[];
-    pagination: { has_next_page: boolean; items: { total: number } };
+    pagination: { last_visible_page: number; has_next_page: boolean; items: { total: number } };
   };
 
   return {
@@ -130,19 +144,32 @@ export async function searchManga(params: {
     total: json.pagination.items.total,
     page: params.page || 1,
     has_next_page: json.pagination.has_next_page,
+    total_pages: json.pagination.last_visible_page,
   };
 }
 
 export async function getMangaById(id: string): Promise<ExternalItem | null> {
-  const res = await fetch(`${BASE_URL}/manga/${id}`, {
-    next: { revalidate: REVALIDATE },
-  });
+  const [mainRes, recJson] = await Promise.all([
+    fetch(`${BASE_URL}/manga/${id}`, { next: { revalidate: REVALIDATE } }),
+    fetch(`${BASE_URL}/manga/${id}/recommendations`, { next: { revalidate: REVALIDATE } })
+      .then((r) => (r.ok ? (r.json() as Promise<{ data?: unknown[] }>) : null))
+      .catch(() => null),
+  ]);
 
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`Jikan API error: ${res.status}`);
+  if (mainRes.status === 404) return null;
+  if (!mainRes.ok) throw new Error(`Jikan API error: ${mainRes.status}`);
 
-  const json = (await res.json()) as { data: Record<string, unknown> };
-  return normalizeManga(json.data);
+  const json = (await mainRes.json()) as { data: Record<string, unknown> };
+  const _recommendations = (recJson?.data ?? []).slice(0, 12);
+
+  const item = normalizeManga({ ...json.data, _recommendations });
+
+  if (!item.description) {
+    const anilist = await fetchAniListByMalId(Number(id), 'MANGA');
+    if (anilist?.description) return { ...item, description: anilist.description };
+  }
+
+  return item;
 }
 
 export async function getMangaGenres(): Promise<Genre[]> {

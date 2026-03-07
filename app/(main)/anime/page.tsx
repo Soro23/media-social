@@ -3,8 +3,7 @@ import type { Metadata } from 'next';
 import { searchAnime, getAnimeGenres } from '@/lib/api/jikan';
 import { cacheItems, getCachedItemsByExternalIds } from '@/lib/cache/items';
 import { ItemGrid, ItemGridSkeleton } from '@/components/items/ItemGrid';
-import { GenreFilter } from '@/components/items/GenreFilter';
-import { SearchBar } from '@/components/items/SearchBar';
+import { BrowseFilters } from '@/components/items/BrowseFilters';
 import { Pagination } from '@/components/items/Pagination';
 import type { Item } from '@/types';
 
@@ -58,18 +57,14 @@ export default async function AnimePage({ searchParams }: AnimePageProps) {
         </p>
       </div>
 
-      <SearchBar />
-
-      <Suspense>
-        <GenreFilter genres={genres} selectedId={genreId} />
-      </Suspense>
+      <BrowseFilters genres={genres} selectedGenreId={genreId} />
 
       <Suspense fallback={<ItemGridSkeleton />}>
         <ItemGrid items={itemsWithStats} />
       </Suspense>
 
       <Suspense>
-        <Pagination currentPage={page} hasNextPage={searchResult.has_next_page} />
+        <Pagination currentPage={page} hasNextPage={searchResult.has_next_page} totalPages={searchResult.total_pages} />
       </Suspense>
     </div>
   );

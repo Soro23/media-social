@@ -63,7 +63,8 @@ export default async function LibroDetailPage({ params }: LibroDetailPageProps) 
   return (
     <ItemDetailLayout
       item={item}
-      categoryLabel="Libro"
+      categoryLabel="Libros"
+      categoryHref="/libros"
       comments={comments}
       isFavorite={isFavorite}
       userScore={userScore}

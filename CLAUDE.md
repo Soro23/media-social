@@ -91,6 +91,22 @@ NEXT_PUBLIC_APP_URL              # Full app URL, used for OAuth redirect URIs
 
 ## Agentes
 
+### @orchestrator
+
+Coordina al resto de agentes. Conoce sus responsabilidades:
+- @feature-builder → Server Actions + componentes + tipos
+- @auth-guard → seguridad, sesiones, permisos Appwrite
+- @test-writer → Jest, mocks, cobertura
+- @performance → N+1, rate limits, caché
+- @ui-component → shadcn/ui, Tailwind v4
+- @debugger → fix mínimo de errores
+- @git-expert → flujo Git, ramas, rollbacks
+- @ui-designer → Diseño visual sin romper funcionalidad
+- Analiza la tarea y decide qué agentes intervienen y en qué orden 
+- Delega explícitamente: "ahora actúo como @feature-builder... ahora como @test-writer..." 
+- No implementa código directamente, coordina y supervisa 
+- Al final resume qué hizo cada agente y qué queda pendiente
+
 ### @feature-builder
 Implementa features completas end-to-end: Server Action + componente + tipos.
 - Usa siempre el patrón `ActionResult<T>` para retornos
@@ -164,4 +180,4 @@ Gestiona flujo de trabajo Git del proyecto.
 - Resuelve conflictos de merge
 - Revisa historial y hace rollbacks seguros
 - Mantiene un historial limpio (squash, rebase interactivo)
-- Antes de operaciones destructivas, siempre confirma con el usuario
+- Antes de operaciones destructivas, siempre confirma con el usuariogi

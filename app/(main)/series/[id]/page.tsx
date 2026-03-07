@@ -63,7 +63,8 @@ export default async function SerieDetailPage({ params }: SerieDetailPageProps) 
   return (
     <ItemDetailLayout
       item={item}
-      categoryLabel="Serie"
+      categoryLabel="Series"
+      categoryHref="/series"
       comments={comments}
       isFavorite={isFavorite}
       userScore={userScore}

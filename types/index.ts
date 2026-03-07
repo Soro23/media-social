@@ -100,6 +100,7 @@ export interface SearchResult {
   total: number;
   page: number;
   has_next_page: boolean;
+  total_pages?: number;
 }
 
 // Géneros disponibles por categoría

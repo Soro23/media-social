@@ -63,7 +63,8 @@ export default async function PeliculaDetailPage({ params }: PeliculaDetailPageP
   return (
     <ItemDetailLayout
       item={item}
-      categoryLabel="Pelicula"
+      categoryLabel="Películas"
+      categoryHref="/peliculas"
       comments={comments}
       isFavorite={isFavorite}
       userScore={userScore}

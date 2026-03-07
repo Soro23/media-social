@@ -142,17 +142,64 @@ export async function searchMovies(params: {
     total: json.total_results,
     page: json.page,
     has_next_page: json.page < json.total_pages,
+    total_pages: json.total_pages,
   };
 }
 
+function trimTMDBData(data: Record<string, unknown>): Record<string, unknown> {
+  const result = { ...data };
+
+  if (result.credits && typeof result.credits === 'object') {
+    const c = result.credits as { cast?: unknown[]; crew?: unknown[] };
+    result.credits = {
+      cast: (c.cast ?? []).slice(0, 15),
+      crew: ((c.crew ?? []) as Array<{ job?: string }>)
+        .filter((m) => ['Director', 'Creator', 'Screenplay', 'Writer', 'Executive Producer'].includes(m.job ?? ''))
+        .slice(0, 8),
+    };
+  }
+
+  if (result.similar && typeof result.similar === 'object') {
+    const s = result.similar as { results?: unknown[] };
+    result.similar = { results: (s.results ?? []).slice(0, 12) };
+  }
+
+  const providers = result['watch/providers'];
+  if (providers && typeof providers === 'object') {
+    const p = providers as { results?: Record<string, unknown> };
+    result['watch/providers'] = {
+      results: Object.fromEntries(
+        Object.entries(p.results ?? {}).filter(([k]) => ['ES', 'US'].includes(k))
+      ),
+    };
+  }
+
+  return result;
+}
+
 export async function getMovieById(id: string): Promise<ExternalItem | null> {
-  const res = await fetch(tmdbUrl(`/movie/${id}`), {
-    next: { revalidate: REVALIDATE },
-  });
+  const res = await fetch(
+    tmdbUrl(`/movie/${id}`, { append_to_response: 'credits,similar,watch/providers' }),
+    { next: { revalidate: REVALIDATE } }
+  );
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`TMDB API error: ${res.status}`);
   const json = (await res.json()) as Record<string, unknown>;
-  return normalizeMovie(json, new Map());
+  const item = normalizeMovie(trimTMDBData(json), new Map());
+
+  if (!item.description) {
+    const url = new URL(`${BASE_URL}/movie/${id}`);
+    url.searchParams.set('api_key', process.env.TMDB_API_KEY ?? '');
+    url.searchParams.set('language', 'en-US');
+    const fallback = await fetch(url.toString(), { next: { revalidate: REVALIDATE } });
+    if (fallback.ok) {
+      const fallbackJson = (await fallback.json()) as Record<string, unknown>;
+      const overview = fallbackJson.overview as string | undefined;
+      if (overview) return { ...item, description: overview };
+    }
+  }
+
+  return item;
 }
 
 // ----- Series -----
@@ -188,15 +235,31 @@ export async function searchSeries(params: {
     total: json.total_results,
     page: json.page,
     has_next_page: json.page < json.total_pages,
+    total_pages: json.total_pages,
   };
 }
 
 export async function getSerieById(id: string): Promise<ExternalItem | null> {
-  const res = await fetch(tmdbUrl(`/tv/${id}`), {
-    next: { revalidate: REVALIDATE },
-  });
+  const res = await fetch(
+    tmdbUrl(`/tv/${id}`, { append_to_response: 'credits,similar,watch/providers' }),
+    { next: { revalidate: REVALIDATE } }
+  );
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`TMDB API error: ${res.status}`);
   const json = (await res.json()) as Record<string, unknown>;
-  return normalizeSerie(json, new Map());
+  const item = normalizeSerie(trimTMDBData(json), new Map());
+
+  if (!item.description) {
+    const url = new URL(`${BASE_URL}/tv/${id}`);
+    url.searchParams.set('api_key', process.env.TMDB_API_KEY ?? '');
+    url.searchParams.set('language', 'en-US');
+    const fallback = await fetch(url.toString(), { next: { revalidate: REVALIDATE } });
+    if (fallback.ok) {
+      const fallbackJson = (await fallback.json()) as Record<string, unknown>;
+      const overview = fallbackJson.overview as string | undefined;
+      if (overview) return { ...item, description: overview };
+    }
+  }
+
+  return item;
 }

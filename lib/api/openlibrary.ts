@@ -3,6 +3,7 @@
 // Sin API key requerida
 
 import type { ExternalItem, Genre, SearchResult } from '@/types';
+import { fetchGoogleBooksDescription, fetchGoogleBooksDescriptionAny } from './googlebooks';
 
 const BASE_URL = 'https://openlibrary.org';
 const COVER_BASE = 'https://covers.openlibrary.org/b/id';
@@ -114,6 +115,7 @@ export async function searchBooks(params: {
     total,
     page,
     has_next_page: offset + limit < total,
+    total_pages: Math.ceil(total / limit),
   };
 }
 
@@ -126,7 +128,35 @@ export async function getBookById(id: string): Promise<ExternalItem | null> {
   if (!res.ok) throw new Error(`Open Library API error: ${res.status}`);
 
   const json = (await res.json()) as Record<string, unknown>;
-  return normalizeBookDetail(json, id);
+
+  // Fetch author names in parallel
+  type AuthorRef = { author?: { key?: string } };
+  const authorRefs = (json.authors as AuthorRef[] | undefined) ?? [];
+  const authorKeys = authorRefs.map((a) => a.author?.key).filter(Boolean) as string[];
+
+  const authorResults = await Promise.all(
+    authorKeys.slice(0, 3).map((key) =>
+      fetch(`${BASE_URL}${key}.json`, { next: { revalidate: REVALIDATE } })
+        .then((r) => (r.ok ? (r.json() as Promise<{ name?: string; key?: string }>) : null))
+        .catch(() => null)
+    )
+  );
+
+  const _authors = authorResults
+    .filter(Boolean)
+    .map((a) => ({ name: a!.name ?? 'Desconocido', key: a!.key ?? '' }));
+
+  const item = normalizeBookDetail({ ...json, _authors }, id);
+
+  if (!item.description) {
+    const title = item.title;
+    const description =
+      (await fetchGoogleBooksDescription(title)) ||
+      (await fetchGoogleBooksDescriptionAny(title));
+    if (description) return { ...item, description };
+  }
+
+  return item;
 }
 
 export async function getBookGenres(): Promise<Genre[]> {

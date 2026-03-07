@@ -68,6 +68,7 @@ export default async function AnimeDetailPage({ params }: AnimeDetailPageProps) 
     <ItemDetailLayout
       item={item}
       categoryLabel="Anime"
+      categoryHref="/anime"
       comments={comments}
       isFavorite={isFavorite}
       userScore={userScore}

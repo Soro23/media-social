@@ -64,6 +64,7 @@ export default async function MangaDetailPage({ params }: MangaDetailPageProps) 
     <ItemDetailLayout
       item={item}
       categoryLabel="Manga"
+      categoryHref="/manga"
       comments={comments}
       isFavorite={isFavorite}
       userScore={userScore}
