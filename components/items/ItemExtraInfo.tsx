@@ -248,12 +248,14 @@ function AnimeSection({ d }: { d: Record<string, unknown> }) {
 
   return (
     <>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid gap-4">
         {status && (
           <InfoSection label="Estado">
             <StatusBadge status={status} />
           </InfoSection>
         )}
+      </div>
+      <div className="grid grid-cols-2 gap-4">
         {episodes && (
           <InfoSection label="Episodios">
             <span>{episodes}</span>
@@ -295,12 +297,14 @@ function MangaSection({ d }: { d: Record<string, unknown> }) {
 
   return (
     <>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid gap-4">
         {status && (
           <InfoSection label="Estado">
             <StatusBadge status={status} />
           </InfoSection>
         )}
+      </div>
+      <div className="grid grid-cols-2 gap-4">
         {volumes && (
           <InfoSection label="Volúmenes">
             <span>{volumes}</span>
@@ -349,12 +353,14 @@ function MovieSection({ d }: { d: Record<string, unknown> }) {
 
   return (
     <>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid gap-4">
         {status && (
           <InfoSection label="Estado">
             <StatusBadge status={status} />
           </InfoSection>
         )}
+      </div>
+      <div className="grid grid-cols-2 gap-4">
         {runtime && (
           <InfoSection label="Duración">
             <span>{Math.floor(runtime / 60)}h {runtime % 60}min</span>
@@ -397,12 +403,14 @@ function SerieSection({ d }: { d: Record<string, unknown> }) {
 
   return (
     <>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid gap-4">
         {status && (
           <InfoSection label="Estado">
             <StatusBadge status={status} />
           </InfoSection>
         )}
+      </div>
+      <div className="grid grid-cols-2 gap-4">
         {seasons && (
           <InfoSection label="Temporadas">
             <span>{seasons}</span>

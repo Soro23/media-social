@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { registerAction } from '@/app/actions/auth';
 import { GoogleButton } from './GoogleButton';
-import { Sparkles } from 'lucide-react';
+import { BrandIcon } from '@/components/layout/BrandIcon';
 
 export function RegisterForm() {
   const [isPending, startTransition] = useTransition();
@@ -36,7 +36,7 @@ export function RegisterForm() {
       {/* Brand header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-primary mb-4 shadow-lg shadow-primary/30">
-          <Sparkles className="h-6 w-6 text-primary-foreground" />
+          <BrandIcon size={22} />
         </div>
         <h1 className="text-2xl font-bold tracking-tight">Unete a la comunidad</h1>
         <p className="text-muted-foreground text-sm mt-1">Crea tu cuenta de MediaSocial gratis</p>

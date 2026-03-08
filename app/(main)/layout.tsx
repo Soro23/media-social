@@ -34,16 +34,25 @@ export default async function MainLayout({
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar profile={profile} />
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4">
         {children}
       </main>
-      <footer className="border-t border-border/50 py-8 mt-12">
-        <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1.5 font-medium">
-            <span className="text-primary">Media</span>
-            <span>Social</span>
+      <footer className="border-t border-border/50 mt-16">
+        <div className="container mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground text-xs font-black">M</span>
+            </div>
+            <span className="font-bold text-sm">
+              <span className="text-primary">Media</span>Social
+            </span>
           </div>
-          <p>© {new Date().getFullYear()} · Datos de Jikan, TMDB y Open Library</p>
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} · Datos de{' '}
+            <span className="font-medium">Jikan</span>,{' '}
+            <span className="font-medium">TMDB</span> y{' '}
+            <span className="font-medium">Open Library</span>
+          </p>
         </div>
       </footer>
     </div>

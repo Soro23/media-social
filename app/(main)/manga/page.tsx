@@ -4,6 +4,7 @@ import { searchManga, getMangaGenres } from '@/lib/api/jikan';
 import { cacheItems, getCachedItemsByExternalIds } from '@/lib/cache/items';
 import { ItemGrid, ItemGridSkeleton } from '@/components/items/ItemGrid';
 import { BrowseFilters } from '@/components/items/BrowseFilters';
+import { PageHeader } from '@/components/items/PageHeader';
 import { Pagination } from '@/components/items/Pagination';
 import type { Item } from '@/types';
 
@@ -48,12 +49,7 @@ export default async function MangaPage({ searchParams }: MangaPageProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-end justify-between gap-4">
-        <h1 className="text-4xl font-extrabold tracking-tight">Manga</h1>
-        <p className="text-sm text-muted-foreground pb-1">
-          {searchResult.total.toLocaleString('es')} títulos
-        </p>
-      </div>
+      <PageHeader title="Manga" total={searchResult.total} />
 
       <BrowseFilters genres={genres} selectedGenreId={genreId} />
 

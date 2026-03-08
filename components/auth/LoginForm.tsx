@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { loginAction } from '@/app/actions/auth';
 import { GoogleButton } from './GoogleButton';
-import { Sparkles } from 'lucide-react';
+import { BrandIcon } from '@/components/layout/BrandIcon';
 
 export function LoginForm() {
   const searchParams = useSearchParams();
@@ -39,7 +39,7 @@ export function LoginForm() {
       {/* Brand header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-primary mb-4 shadow-lg shadow-primary/30">
-          <Sparkles className="h-6 w-6 text-primary-foreground" />
+          <BrandIcon size={22} />
         </div>
         <h1 className="text-2xl font-bold tracking-tight">Bienvenido de nuevo</h1>
         <p className="text-muted-foreground text-sm mt-1">Entra a tu cuenta de MediaSocial</p>

@@ -19,13 +19,12 @@ const CATEGORY_LABELS: Record<Category, string> = {
   serie: 'Serie',
 };
 
-// Subtle color per category for the badge
 const CATEGORY_COLORS: Record<Category, string> = {
-  anime:    'bg-violet-500/90 text-white',
-  manga:    'bg-orange-700/90 text-white',
-  libro:    'bg-amber-500/90 text-white',
-  pelicula: 'bg-rose-500/90 text-white',
-  serie:    'bg-emerald-500/90 text-white',
+  anime:    'bg-violet-600/90',
+  manga:    'bg-rose-600/90',
+  libro:    'bg-sky-600/90',
+  pelicula: 'bg-slate-600/90',
+  serie:    'bg-emerald-600/90',
 };
 
 interface ItemCardProps {
@@ -38,66 +37,60 @@ export function ItemCard({ item, showCategory = false, priority = false }: ItemC
   const path = `${CATEGORY_PATHS[item.category]}/${item.external_id}`;
 
   return (
-    <Link href={path} className="group block">
-      <div className="relative overflow-hidden rounded-xl bg-muted shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:shadow-primary/10">
+    <Link href={path} className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-2xl">
+      <article className="overflow-hidden rounded-2xl ring-1 ring-black/8 dark:ring-white/8 transition-all duration-300 ease-out group-hover:-translate-y-2 group-hover:shadow-2xl group-hover:shadow-primary/25 group-hover:ring-primary/50">
+
         {/* Poster */}
-        <div className="relative aspect-[2/3] w-full overflow-hidden">
+        <div className="relative aspect-[2/3] overflow-hidden bg-muted">
           {item.cover_url ? (
             <Image
               src={item.cover_url}
               alt={item.title}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
               priority={priority}
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground text-xs">
-              Sin imagen
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-muted-foreground/30 text-xs">Sin imagen</span>
             </div>
           )}
 
-          {/* Gradient overlay at bottom */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          {/* Permanent bottom gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
 
           {/* Category badge */}
           {showCategory && (
-            <div className="absolute top-2 left-2">
-              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm ${CATEGORY_COLORS[item.category]}`}>
-                {CATEGORY_LABELS[item.category]}
-              </span>
+            <span className={`absolute top-2 left-2 text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 rounded-full text-white backdrop-blur-sm ${CATEGORY_COLORS[item.category]}`}>
+              {CATEGORY_LABELS[item.category]}
+            </span>
+          )}
+
+          {/* Rating pill */}
+          {item.rating_count > 0 && (
+            <div className="absolute bottom-2 right-2 flex items-center gap-0.5 rounded-md bg-black/70 backdrop-blur-sm px-1.5 py-0.5">
+              <Star className="h-2.5 w-2.5 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+              <span className="text-[11px] font-bold text-white leading-none">{item.avg_rating}</span>
             </div>
           )}
 
-          {/* Rating badge */}
-          {item.rating_count > 0 && (
-            <div className="absolute bottom-2 right-2 flex items-center gap-0.5 bg-black/75 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
-              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-              <span className="font-semibold">{item.avg_rating}</span>
-            </div>
-          )}
+          {/* Hover overlay shimmer */}
+          <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-overlay" />
         </div>
 
         {/* Info */}
-        <div className="p-2.5">
-          <h3 className="font-semibold text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors duration-150">
+        <div className="bg-card px-3 py-2.5">
+          <h3 className="font-semibold text-sm leading-snug line-clamp-2 text-foreground group-hover:text-primary transition-colors duration-200">
             {item.title}
           </h3>
-          <div className="flex items-center gap-1.5 mt-1">
-            {item.year && (
-              <span className="text-[11px] text-muted-foreground">{item.year}</span>
-            )}
-            {item.year && item.genres.length > 0 && (
-              <span className="text-[11px] text-muted-foreground">·</span>
-            )}
-            {item.genres.length > 0 && (
-              <span className="text-[11px] text-muted-foreground truncate">
-                {item.genres[0]}
-              </span>
-            )}
-          </div>
+          {(item.year || item.genres.length > 0) && (
+            <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+              {[item.year, item.genres[0]].filter(Boolean).join(' · ')}
+            </p>
+          )}
         </div>
-      </div>
+      </article>
     </Link>
   );
 }

@@ -13,6 +13,7 @@ interface RatingWidgetProps {
   avgRating: number;
   ratingCount: number;
   isAuthenticated: boolean;
+  showCommunityAvg?: boolean;
 }
 
 export function RatingWidget({
@@ -21,6 +22,7 @@ export function RatingWidget({
   avgRating,
   ratingCount,
   isAuthenticated,
+  showCommunityAvg,
 }: RatingWidgetProps) {
   const router = useRouter();
   const [hoveredScore, setHoveredScore] = useState<number | null>(null);
@@ -58,20 +60,22 @@ export function RatingWidget({
   return (
     <div className="space-y-3">
       {/* Community avg */}
-      <div className="flex items-baseline gap-2">
-        <div className="flex items-center gap-1.5">
-          <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-          <span className="text-2xl font-bold tracking-tight">
-            {avgRating > 0 ? avgRating : '—'}
-          </span>
-          <span className="text-sm text-muted-foreground font-medium">/10</span>
+      {showCommunityAvg !== false && (
+        <div className="flex items-baseline gap-2">
+          <div className="flex items-center gap-1.5">
+            <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+            <span className="text-2xl font-bold tracking-tight">
+              {avgRating > 0 ? avgRating : '—'}
+            </span>
+            <span className="text-sm text-muted-foreground font-medium">/10</span>
+          </div>
+          {ratingCount > 0 && (
+            <span className="text-sm text-muted-foreground">
+              {ratingCount.toLocaleString('es')} {ratingCount === 1 ? 'voto' : 'votos'}
+            </span>
+          )}
         </div>
-        {ratingCount > 0 && (
-          <span className="text-sm text-muted-foreground">
-            {ratingCount.toLocaleString('es')} {ratingCount === 1 ? 'voto' : 'votos'}
-          </span>
-        )}
-      </div>
+      )}
 
       {/* User score input */}
       <div>
